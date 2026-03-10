@@ -94,7 +94,7 @@ int main()
     cudaEventRecord(start);
 
     dim3 block(32,32);
-    dim3 grid( (N + 31 -1) / 32, (o_s + 31 -1) / 32);
+    dim3 grid( (N + 32 -1) / 32, (o_s + 32 -1) / 32);
 
     for(int i=0; i<S; i++)
     {

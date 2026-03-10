@@ -85,7 +85,7 @@ int main()
     cudaEventRecord(start);
 
     dim3 block(32,32);
-    dim3 grid( (N + 31 -1) / 32, (B + 31 -1) / 32);
+    dim3 grid( (N + 32 -1) / 32, (B + 32 -1) / 32);
 
     matmul<<<grid, block>>>( d_X, d_W1, d_Y, B, N );
     relu<<<grid, block>>>( d_Y, B, N );
