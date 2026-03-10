@@ -39,7 +39,7 @@ __global__ void matmul(float *A, float *B, float *C, int N)
 
         for(int e=0; e<ele; e++)
         {
-            int globalCol = baseGlobalCol + + localCol + e * T;
+            int globalCol = baseGlobalCol + localCol + e * T;
             int bCol = globalCol;
             
             if(bRow<N && bCol<N)
@@ -82,7 +82,7 @@ int main()
 {
     int N = 128;
     size_t size = N * N * sizeof(float);
-    size_t shared_mem = (T * T) + (T * T * ele) * sizeof(float) ;
+    size_t shared_mem = ((T * T) + (T * T * ele)) * sizeof(float) ;
 
     //Allocate host memory
     float *h_A = (float *)malloc(size);
