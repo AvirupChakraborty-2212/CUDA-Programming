@@ -20,9 +20,15 @@ int num_ele = 50;
 size_t size = num_ele * sizeof(float);
 
 // allocate host memory
-float *h_A = (float *)malloc(size);
-float *h_B = (float *)malloc(size);
-float *h_C = (float *)malloc(size);
+//float *h_A = (float *)malloc(size);
+//float *h_B = (float *)malloc(size);
+//float *h_C = (float *)malloc(size);
+
+//using cudamallocHost
+float *h_A, *h_B, *h_C;
+cudaMallocHost((void**)&h_A, size);
+cudaMallocHost((void**)&h_B, size);
+cudaMallocHost((void**)&h_C, size);
 
 // initialize
 
@@ -56,6 +62,8 @@ vecAdd<<<num_blocks , threads_per_block>>>(d_A, d_B, d_C, num_ele);
 
 cudaMemcpy(h_C, d_C, size, cudaMemcpyDeviceToHost);
 
+printf("value at 0 %f: \n", h_C[0]);
+
 for(int i=0; i<num_ele; i++)
 {
     if(fabs(h_A[i] + h_B[i] - h_C[i]) > 1e-5){
@@ -72,9 +80,14 @@ cudaFree(d_A);
 cudaFree(d_B);
 cudaFree(d_C);
 
-free(h_A);
-free(h_B);
-free(h_C);
+//free(h_A);
+//free(h_B);
+//free(h_C);
 
+// using cuda free host
+
+cudaFreeHost(h_A);
+cudaFreeHost(h_B);
+cudaFreeHost(h_C);
 return 0;
 }
