@@ -5,11 +5,11 @@
 
 #define T 4
 
+
 __global__ void matmul(float *A, float *B, float*C, int N)
 {
     extern __shared__ float s[];
-    float *sA = s;
-    float *sB = s + T*T;
+    float *sA = s;    
     
     int globalRow = blockIdx.y * blockDim.y + threadIdx.y;
     int globalCol = blockIdx.x * blockDim.x + threadIdx.x;
@@ -24,8 +24,7 @@ __global__ void matmul(float *A, float *B, float*C, int N)
 
     {
         int aRow = globalRow;
-        int aCol = i*T+localCol;
-        int bRow = i*T+localRow;
+        int aCol = i*T+localCol;        
         int bCol = globalCol;
 
         if(aRow < N && aCol < N)
@@ -37,21 +36,24 @@ __global__ void matmul(float *A, float *B, float*C, int N)
             sA[localRow * T + localCol] = 0.0f;
         }
 
-        if(bRow < N && bCol < N)
-        {
-            sB[localRow * T + localCol] = B[bRow * N + bCol];
-        }
-        else
-        {
-            sB[localRow * T + localCol] = 0.0f;
-        }
         __syncthreads();
 
-        int limit = T;
+        int limit = T;        
 
-        for(int i=0; i<limit; i++)
+        for(int k=0; k<limit; k++)
         {
-            acc += sA[localRow * T + i] * sB[i * T + localCol];
+            int bRow = i*T+k;
+            float valA = sA[localRow * T + k];
+            float valB;
+            if(bRow<N && bCol<N)
+            {
+                valB = B[bRow * N + bCol];
+            } 
+            else
+            {
+                valB = 0.0f;
+            }               
+            acc += valA * valB;
         }
 
         __syncthreads();
@@ -68,7 +70,7 @@ int main()
 {   
     int N = 128;
     size_t size = N*N*sizeof(float);
-    size_t shared_size = 2*T*T*sizeof(float);
+    size_t shared_size = T*T*sizeof(float);
 
     // allocate memory host
     float *h_A, *h_B, *h_C;
@@ -103,7 +105,7 @@ int main()
     cudaMemcpy(h_C, d_C, size, cudaMemcpyDeviceToHost);
 
     // print
-    printf("result at 0 %f : \n", h_C[0]);
+    printf("result at 0 : %f\n", h_C[0]);
 
     // free
     cudaFree(d_A);
