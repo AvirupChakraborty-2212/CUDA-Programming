@@ -49,9 +49,9 @@ __global__ void matmul(float *A, float *B, float*C, int N)
 
         int limit = T;
 
-        for(int i=0; i<limit; i++)
+        for(int k=0; k<limit; k++)
         {
-            acc += sA[localRow * T + i] * sB[i * T + localCol];
+            acc += sA[localRow * T + k] * sB[k * T + localCol];
         }
 
         __syncthreads();
