@@ -100,7 +100,7 @@ int main()
     {
         int offset = i * o_s * N;
         matmul<<<grid, block, 0, streams[i]>>>( d_X + offset, d_W1, d_Y + offset, o_s, N );
-        relu<<<grid, block, 0, streams[i]>>>( d_Y + offset, B, N );
+        relu<<<grid, block, 0, streams[i]>>>( d_Y + offset, o_s, N );
         matmul<<<grid, block, 0, streams[i]>>>( d_Y + offset, d_W2, d_Z + offset, o_s, N );
     }
 
@@ -113,9 +113,12 @@ int main()
 
     printf("Elapsed time: %f ms\n", ms);
 
+    cudaDeviceSynchronize();
     // copy device to host
     cudaMemcpy(h_Z, d_Z, size_x, cudaMemcpyDeviceToHost);
 
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
     // free memory
     for(int i=0; i<S; i++)
     {
