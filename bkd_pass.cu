@@ -101,7 +101,7 @@ __global__ void db_sum(float *dZ, float *db, int N, int OUT)
 
     if(col < OUT)
     {
-        float sum=0.0f;
+        float sum = 0.0f;
         for(int i=0; i<N; i++)
         {
             sum+=dZ[i * OUT + col];
